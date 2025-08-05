@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shahan’s Premium Site</title>
+<style>
+  @font-face {
+    font-family: 'FuturaDisplay';
+    src: url('Futura Display.ttf') format('truetype');
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, #f8f8f8, #e0e0e0);
+    color: #333;
+    overflow-x: hidden;
+    transition: background 0.6s ease, color 0.6s ease;
+    position: relative;
+  }
+  body.dark {
+    background: linear-gradient(180deg, #121212, #1c1c1c);
+    color: #eaeaea;
+  }
+
+  /* Floating background balls */
+  .dot {
+    position: fixed;
+    border-radius: 50%;
+    opacity: 0.3;
+    z-index: -1;
+    animation: float 12s infinite ease-in-out;
+  }
+  .dot1 { width: 100px; height: 100px; background: #ff8fa3; top: 20%; left: 15%; }
+  .dot2 { width: 150px; height: 150px; background: #91a7ff; top: 40%; left: 70%; animation-delay: 3s; }
+  .dot3 { width: 120px; height: 120px; background: #b197fc; top: 65%; left: 20%; animation-delay: 5s; }
+  .dot4 { width: 80px; height: 80px; background: #ffb347; top: 80%; left: 80%; animation-delay: 7s; }
+  @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(40px,-30px); } }
+
+  /* Sidebar */
+  .hamburger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1100;
+  }
+  .hamburger span {
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: #6a11cb;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
+  }
+  body.dark .hamburger span { background: #fff; }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px; /* FIX: slightly more offset to fully hide */
+    width: 250px;
+    height: 100%;
+    background: #6a11cb;
+    color: #fff;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  }
+  .sidebar.active { left: 0; }
+  .sidebar a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  /* Dark mode toggle */
+  .dark-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* SHAHAN letters */
+  .shahan-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 120px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+  .letter {
+    font-family: 'FuturaDisplay', sans-serif;
+    font-size: 6rem;
+    background: linear-gradient(145deg, #9b5de5, #d0a3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    transition: transform 0.2s ease;
+    user-select: none;
+    touch-action: none;
+  }
+  .letter:active { cursor: grabbing; }
+
+  /* Sections */
+  section {
+    background: white;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  section img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-top: 15px;
+  }
+  body.dark section { background: #1e1e1e; }
+
+  /* Fun fact cards */
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  .card {
+    width: 180px;
+    height: 120px;
+    background: linear-gradient(145deg, #9b5de5, #d0a3ff);
+    color: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    perspective: 1000px;
+    transition: transform 0.3s ease;
+  }
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    font-size: 1rem;
+    padding: 10px;
+  }
+  .card-back {
+    background: #6a11cb;
+    transform: rotateY(180deg);
+  }
+
+  /* VIP modal */
+  .vip-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1200;
+    justify-content: center;
+    align-items: center;
+  }
+  .vip-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+  }
+  body.dark .vip-modal-content { background: #2a2a2a; color: white; }
+  .vip-modal input {
+    padding: 10px;
+    width: 80%;
+    margin-top: 15px;
+    border: 2px solid #6a11cb;
+    border-radius: 10px;
+  }
+  .vip-modal button {
+    background: #6a11cb;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  /* VIP section */
+  #vip {
+    display: none;
+    margin-bottom: 80px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .shahan-container { font-size: 4rem; gap: 10px; padding-top: 80px; }
+    section { margin: 30px 10px; padding: 20px; }
+    .card { width: 45%; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating background balls -->
+<div class="dot dot1"></div>
+<div class="dot dot2"></div>
+<div class="dot dot3"></div>
+<div class="dot dot4"></div>
+
+<!-- Hamburger + Sidebar -->
+<div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+<div class="sidebar" id="sidebar">
+  <a href="#origin">Name Origin</a>
+  <a href="#birth">Birth</a>
+  <a href="#about">About</a>
+  <a href="#current">Current</a>
+  <a href="#funfacts">Fun Facts</a>
+  <a href="#" id="vip-link">VIP Zone</a>
+</div>
+
+<!-- Dark mode -->
+<button class="dark-toggle" id="dark-toggle">🌙</button>
+
+<!-- SHAHAN Letters -->
+<div class="shahan-container">
+  <div class="letter">S</div>
+  <div class="letter">H</div>
+  <div class="letter">A</div>
+  <div class="letter">H</div>
+  <div class="letter">A</div>
+  <div class="letter">N</div>
+</div>
+
+<!-- Sections -->
+<section id="origin"><h2>Name Origin</h2><p>Shahan is of Persian origin, meaning "king" or "royal".</p><img src="nameorigin.png"></section>
+<section id="birth"><h2>Birth</h2><p>Born on 12 June 2007 in Sialkot, Pakistan at 10 PM.</p><img src="birth.jpeg"></section>
+<section id="about"><h2>About</h2><p>A multi-talented teen skilled in coding, singing, dancing, and art.</p><img src="about.jpeg"></section>
+<section id="current"><h2>Current</h2><p>Preparing for university life with big dreams and goals.</p><img src="current.png"></section>
+
+<section id="funfacts">
+  <h2>Fun Facts</h2>
+  <div class="cards">
+    <div class="card"><div class="card-inner"><div class="card-front">Doesn't like vegetables</div><div class="card-back">Night owl vibes</div></div></div>
+    <div class="card"><div class="card-inner"><div class="card-front">Can code for hours</div><div class="card-back">Creative thinker</div></div></div>
+    <div class="card"><div class="card-inner"><div class="card-front">Loves dancing</div><div class="card-back">Stage-ready moves</div></div></div>
+  </div>
+</section>
+
+<section id="vip"><h2>VIP Gallery</h2><p>Exclusive content unlocked!</p></section>
+
+<!-- VIP Modal -->
+<div class="vip-modal" id="vip-modal">
+  <div class="vip-modal-content">
+    <h2>Enter VIP Password</h2>
+    <input type="password" id="vip-password" placeholder="Password">
+    <button id="vip-submit">Unlock</button>
+    <p id="vip-error" style="color:red;display:none;">WRONG PASSWORD!</p>
+  </div>
+</div>
+
+<script>
+  // Sidebar toggle
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  hamburger.onclick = () => sidebar.classList.toggle('active');
+
+  // Dark mode
+  document.getElementById('dark-toggle').onclick = (event) => {
+    document.body.classList.toggle('dark');
+    event.target.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  };
+
+  // Drag letters with spring
+  document.querySelectorAll('.letter').forEach(letter => {
+    let offsetX = 0, offsetY = 0;
+    let isDragging = false;
+
+    const onMove = (e) => {
+      if (!isDragging) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const y = e.touches ? e.touches[0].clientY : e.clientY;
+      letter.style.transform = `translate(${x - offsetX}px, ${y - offsetY}px)`;
+    };
+    const onUp = () => {
+      isDragging = false;
+      letter.style.transition = 'transform 0.5s cubic-bezier(.25,1.5,.5,1)';
+      letter.style.transform = 'translate(0,0)';
+      setTimeout(() => letter.style.transition = '', 500);
+    };
+    letter.addEventListener('mousedown', (e) => { isDragging = true; offsetX = e.clientX; offsetY = e.clientY; });
+    letter.addEventListener('touchstart', (e) => { isDragging = true; offsetX = e.touches[0].clientX; offsetY = e.touches[0].clientY; });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onUp);
+  });
+
+  // Fun fact flip
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('flipped'));
+  });
+
+  // VIP password modal
+  const vipModal = document.getElementById('vip-modal');
+  document.getElementById('vip-link').onclick = (e) => {
+    e.preventDefault();
+    vipModal.style.display = 'flex';
+  };
+  document.getElementById('vip-submit').onclick = () => {
+    const pass = document.getElementById('vip-password').value;
+    if (pass === "SHAHAN2007") {
+      vipModal.style.display = 'none';
+      document.getElementById('vip').style.display = 'block';
+      document.getElementById('vip').scrollIntoView({ behavior: 'smooth' });
+      launchConfetti();
+    } else {
+      document.getElementById('vip-error').style.display = 'block';
+    }
+  };
+
+  // Confetti
+  function launchConfetti() {
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement('div');
+      confetti.style.position = 'fixed';
+      confetti.style.width = '10px';
+      confetti.style.height = '10px';
+      confetti.style.background = `hsl(${Math.random() * 360}, 70%, 50%)`;
+      confetti.style.top = '-10px';
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      confetti.style.opacity = 0.7;
+      confetti.style.zIndex = 2000;
+      document.body.appendChild(confetti);
+      const fall = confetti.animate(
+        [
+          { transform: 'translateY(0)' },
+          { transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 360}deg)` }
+        ],
+        { duration: Math.random() * 2000 + 2000, easing: 'ease-out' }
+      );
+      fall.onfinish = () => confetti.remove();
+    }
+  }
+</script>
+</body>
+</html>
