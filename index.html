@@ -238,9 +238,49 @@
     section { margin: 30px 10px; padding: 20px; }
     .card { width: 45%; height: 100px; }
   }
+
+/* Force VIP images layout */
+#vip .vip-images {
+  display: grid !important;
+  grid-template-columns: repeat(2, auto) !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  max-width: 320px !important;
+  margin: 0 auto !important;
+}
+
+#vip .vip-images img {
+  width: 140px !important;
+  height: 140px !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.3s ease !important;
+}
+
+#vip .vip-images img:hover {
+  transform: scale(1.05) !important;
+}
+
+@media (max-width: 600px) {
+  #vip .vip-images {
+    max-width: 260px !important;
+  }
+  #vip .vip-images img {
+    width: 120px !important;
+    height: 120px !important;
+  }
+}
+
 </style>
 </head>
 <body>
+<div class="orb-wrapper">
+  <canvas id="aura-orb" width="150" height="150"></canvas>
+</div>
+
+
+
 
 <!-- Floating background balls -->
 <div class="dot dot1"></div>
@@ -287,7 +327,33 @@
   </div>
 </section>
 
-<section id="vip"><h2>VIP Gallery</h2><p>Exclusive content unlocked!</p></section>
+<section id="vip">
+  <h2>VIP Gallery</h2>
+  <p>Exclusive content unlocked!</p>
+
+  <!-- ME Section -->
+  <div class="vip-subsection">
+    <h3>Me</h3>
+    <div class="vip-images">
+      <img src="me1.jpeg" alt="Me 1">
+      <img src="me2.jpeg" alt="Me 2">
+    </div>
+  </div>
+
+  <!-- Expert Culinary Section -->
+  <div class="vip-subsection">
+    <h3>Expert Culinary</h3>
+    <div class="vip-images">
+      <img src="cook1.jpeg" alt="Culinary 1">
+      <img src="cook2.jpeg" alt="Culinary 2">
+      <img src="cook3.jpeg" alt="Culinary 3">
+      <img src="cook4.jpeg" alt="Culinary 4">
+      <img src="cook5.jpeg" alt="Culinary 5">
+    </div>
+  </div>
+</section>
+
+
 
 <!-- VIP Modal -->
 <div class="vip-modal" id="vip-modal">
@@ -383,5 +449,125 @@
     }
   }
 </script>
+<style>
+  .orb-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  #aura-orb {
+    width: 150px;
+    height: 150px;
+    filter: blur(3px) brightness(1.3);
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+  .orb-glow {
+    transform: scale(1.05);
+    filter: blur(4px) brightness(1.7) !important;
+  }
+  @media (max-width: 600px) {
+    #aura-orb {
+      width: 120px;
+      height: 120px;
+    }
+
+.vip-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 320px; /* container width for 2 images */
+  margin: 0 auto;
+}
+
+.vip-images img {
+  flex: 0 0 calc(50% - 12px); /* exactly 2 images per row */
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.vip-images img:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .vip-images img {
+    width: 120px;
+    height: 120px;
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+
+  }
+</style>
+
+<script>
+  const orbCanvas = document.getElementById('aura-orb');
+  const orbCtx = orbCanvas.getContext('2d');
+  let orbTime = 0;
+
+  orbCanvas.addEventListener('mousemove', () => {
+    orbCanvas.classList.add('orb-glow');
+    clearTimeout(orbCanvas._hoverTimeout);
+    orbCanvas._hoverTimeout = setTimeout(() => {
+      orbCanvas.classList.remove('orb-glow');
+    }, 300);
+  });
+
+  function smoothRadius(angle, baseRadius, noiseFactor, speed, offset) {
+    return baseRadius +
+      Math.sin(angle * 2 + orbTime * speed + offset) * noiseFactor +
+      Math.cos(angle * 2 + orbTime * speed * 0.9 + offset) * (noiseFactor * 0.5);
+  }
+
+  function drawLayer(baseRadius, noiseFactor, speed, color, opacity, breathingSpeed, offset, isStatic) {
+    orbCtx.beginPath();
+    orbCtx.globalAlpha = opacity;
+    orbCtx.fillStyle = color;
+
+    const breathing = isStatic ? 0 : Math.sin(orbTime * breathingSpeed + offset) * 6;
+    const points = 360;
+
+    for (let i = 0; i <= points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      const r = smoothRadius(angle, baseRadius + breathing, isStatic ? 2 : noiseFactor, speed, offset);
+      const x = Math.cos(angle) * r;
+      const y = Math.sin(angle) * r;
+      i === 0 ? orbCtx.moveTo(x, y) : orbCtx.lineTo(x, y);
+    }
+
+    orbCtx.closePath();
+    orbCtx.fill();
+  }
+
+  function drawOrb() {
+    orbCtx.clearRect(0, 0, orbCanvas.width, orbCanvas.height);
+    orbCtx.save();
+    orbCtx.translate(orbCanvas.width / 2, orbCanvas.height / 2);
+
+    orbCtx.globalCompositeOperation = 'lighter';
+
+    drawLayer(35, 3, 0.07, 'rgba(128, 0, 128, 0.35)', 0.8, 0.025, 0, true);
+    drawLayer(45, 4, 0.065, 'rgba(186, 85, 211, 0.35)', 0.75, 0.025, 0.5, false);
+    drawLayer(55, 4, 0.06, 'rgba(216, 191, 216, 0.3)', 0.7, 0.025, 1, true);
+    drawLayer(65, 5, 0.055, 'rgba(147, 112, 219, 0.25)', 0.65, 0.025, 1.5, false);
+    drawLayer(75, 4, 0.05, 'rgba(221, 160, 221, 0.2)', 0.6, 0.025, 2, false);
+
+    orbCtx.restore();
+    orbCtx.globalCompositeOperation = 'source-over';
+    orbTime += 0.04;
+
+    requestAnimationFrame(drawOrb);
+  }
+
+  drawOrb();
+</script>
+
+
 </body>
 </html>
